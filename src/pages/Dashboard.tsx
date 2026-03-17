@@ -43,7 +43,7 @@ const Dashboard = () => {
       .order('created_at', { ascending: false });
     if (data) {
       const map: Record<string, Assessment> = {};
-      (data as Assessment[]).forEach(a => {
+      (data as unknown as Assessment[]).forEach(a => {
         if (!map[a.patient_id]) map[a.patient_id] = a;
       });
       setLatestAssessments(map);
