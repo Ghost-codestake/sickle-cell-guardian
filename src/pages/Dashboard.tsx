@@ -55,8 +55,8 @@ const Dashboard = () => {
       supabase.from('vitals').select('*').eq('patient_id', patientId).order('recorded_at', { ascending: true }),
       supabase.from('assessments').select('*').eq('patient_id', patientId).order('created_at', { ascending: false }),
     ]);
-    if (vitalsRes.data) setVitals(vitalsRes.data as Vital[]);
-    if (assessmentsRes.data) setAssessments(assessmentsRes.data as Assessment[]);
+    if (vitalsRes.data) setVitals(vitalsRes.data as unknown as Vital[]);
+    if (assessmentsRes.data) setAssessments(assessmentsRes.data as unknown as Assessment[]);
   }, []);
 
   useEffect(() => {
