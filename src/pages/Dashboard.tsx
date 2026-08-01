@@ -30,6 +30,24 @@ const Dashboard = () => {
   const [showAddPatient, setShowAddPatient] = useState(false);
   const [assessingRisk, setAssessingRisk] = useState(false);
   const [flashScore, setFlashScore] = useState(false);
+  const [profileName, setProfileName] = useState('');
+  const accountName = profileName || (typeof user?.user_metadata?.full_name === 'string' && user.user_metadata.full_name.trim()
+    ? user.user_metadata.full_name.trim()
+    : user?.email ?? 'Signed in');
+
+  useEffect(() => {
+    if (!user) {
+      setProfileName('');
+      return;
+    }
+
+    supabase
+      .from('profiles')
+      .select('full_name')
+      .eq('user_id', user.id)
+      .maybeSingle()
+      .then(({ data }) => setProfileName(data?.full_name?.trim() ?? ''));
+  }, [user]);
 
   const fetchPatients = useCallback(async () => {
     const { data } = await supabase.from('patients').select('*').order('last_name');
@@ -183,6 +201,12 @@ const Dashboard = () => {
           />
         </div>
         <div className="p-3 border-t border-sidebar-border space-y-2">
+          <div className="min-w-0 px-2 pb-1">
+            <p className="truncate text-xs font-medium text-sidebar-foreground" title={accountName}>{accountName}</p>
+            {user?.email && accountName !== user.email && (
+              <p className="truncate text-xs text-sidebar-foreground/60" title={user.email}>{user.email}</p>
+            )}
+          </div>
           <Button variant="outline" size="sm" className="w-full gap-1.5 bg-sidebar-accent border-sidebar-border text-sidebar-foreground hover:bg-sidebar-accent/80" onClick={() => setShowAddPatient(true)}>
             <Plus className="h-3.5 w-3.5" /> Add Patient
           </Button>
