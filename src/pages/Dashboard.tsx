@@ -30,9 +30,24 @@ const Dashboard = () => {
   const [showAddPatient, setShowAddPatient] = useState(false);
   const [assessingRisk, setAssessingRisk] = useState(false);
   const [flashScore, setFlashScore] = useState(false);
-  const accountName = typeof user?.user_metadata?.full_name === 'string' && user.user_metadata.full_name.trim()
+  const [profileName, setProfileName] = useState('');
+  const accountName = profileName || (typeof user?.user_metadata?.full_name === 'string' && user.user_metadata.full_name.trim()
     ? user.user_metadata.full_name.trim()
-    : user?.email ?? 'Signed in';
+    : user?.email ?? 'Signed in');
+
+  useEffect(() => {
+    if (!user) {
+      setProfileName('');
+      return;
+    }
+
+    supabase
+      .from('profiles')
+      .select('full_name')
+      .eq('user_id', user.id)
+      .maybeSingle()
+      .then(({ data }) => setProfileName(data?.full_name?.trim() ?? ''));
+  }, [user]);
 
   const fetchPatients = useCallback(async () => {
     const { data } = await supabase.from('patients').select('*').order('last_name');
